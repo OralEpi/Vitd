@@ -1,0 +1,49 @@
+///Tom Dudding, Simon Haworth, Nic Timpson
+///Date: 24th June 2015
+///Version 2
+///Project: GWAS rare varient vitamin D
+///Stage: Phenotype variable generation
+///withdrawl of consent dealt with prior to using this file
+
+//Need to run "\\ads.bris.ac.uk\filestore\MyFiles\Staff3\td8069\Documents\Data\WINDOWSdata_extraction_childgwas.do"
+//before to extract variables and remove WOC participants
+
+
+//This file converts the SNP files from bluecrystal and converts to .dta files before merging on aln and qlet
+clear all
+set more off
+
+cd "/Volumes/td8069/Documents/Data/WGS_analysis_2"
+
+//import each SNP file, change varnames and convert to .dta
+foreach file in ASP2rs12785878 ASP2rs10741657 ASP2rs2282679 ASP2rs6013897 ASP2rs5988117 {
+
+import delimited `file'.txt, varnames(nonames) clear delim(" ")
+rename v1 UK10kID
+rename v5 aln
+rename v6 qlet
+drop v7
+
+drop if aln ==.
+
+gen `file'_d = (v2*0 + v3*1 + v4*2)
+
+save `file'.dta, replace
+
+
+}
+
+
+//combine all snp files
+
+
+merge 1:1 aln qlet using ASP2rs12785878.dta, nogen
+merge 1:1 aln qlet using ASP2rs10741657.dta, nogen
+merge 1:1 aln qlet using ASP2rs2282679.dta, nogen
+merge 1:1 aln qlet using ASP2rs6013897.dta, nogen
+
+
+order aln qlet
+
+save mergedsnpfile.dta, replace
+
